@@ -1,3 +1,5 @@
+import random, sys, os, math
+
 print("Привет мир")
 print('Пока'+'Мир')
 str8 = (5 - 1) * ( (7 + 1) / (3 - 1))
@@ -15,3 +17,40 @@ if int(myAge) > 18:
 else:
     print('Вы не совершеннолетний')
   
+myAgeNew = int(myAge)
+
+#while myAgeNew < 100:
+#    myAgeNew = myAgeNew + 1
+#    print('Вы еще живы. ' + 'Ваш возраст ' + str(myAgeNew))
+#    print('Еще год')
+#    if myAgeNew == 0:
+#        break
+#print('Всего доброго')
+
+print('Введите числе больше 10')
+cirlce = int(input())
+
+while 1:
+    cirlce = cirlce - 1
+    if cirlce == 20:
+        sys.exit()
+    if cirlce == 10:
+        break
+    if cirlce < 10:
+        print('Введите числе больше 10')
+        cirlce = int(input())
+        continue
+    print(cirlce)
+    print('Всего доброго')
+
+
+
+for i in range(0,12,3):
+    print(i)
+
+for i in range(3,15):
+    print(i)
+
+
+rand = random.randint(1,100000000000000)
+print(rand)
