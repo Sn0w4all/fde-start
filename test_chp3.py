@@ -1,21 +1,22 @@
-import random, sys, os, math
-
 def collatz(num):
     if num % 2:
-        resault = 3 * num + 1
+        result = 3 * num + 1
     else:
-        resault = num // 2
-    print(resault)
-    return resault
+        result = num // 2
+    print(result)
+    return result
 print('Введите число')
 while 1:
     try:
         number = int(input())
+        if number <= 0:
+            print('Введите натуральное число (целое, больше 0)')
+            continue
         while 1:
             number=collatz(number)
             if number == 1:
                 break
         break
-    except:
-        ValueError
+    except ValueError:
+        print('Ошибка. Вы ввели не целое число')     
     print('Введите целое число')
