@@ -26,7 +26,8 @@ with open('portfolio.csv', newline='', encoding = 'utf-8-sig') as f:
 
 #считаем сумму уплавченной комиссии
 commision = 0
-dateFrom = date.today()
+# так не делаем dateFrom = date.today()
+dateFrom = date.fromisoformat(rows[0]['Дата'])
 dateTo = dateFrom
 for row in rows:
     try:
