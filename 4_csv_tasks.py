@@ -28,13 +28,13 @@ with open('portfolio.csv', newline='', encoding = 'utf-8-sig') as f:
 commision = 0
 dateFrom = date.today()
 dateTo = dateFrom
-for i in range(0, len(rows)):
+for row in rows:
     try:
-        if (rows[i]['Операция'] in ('Брокерская комиссия', 'Услуги сторонних организаций')):
-            commision += float(rows[i]['Объем транзакции'].replace(',', '.'))
-            if dateFrom > date.fromisoformat(rows[i]['Дата']):
-                dateFrom = date.fromisoformat(rows[i]['Дата'])
+        if (row['Операция'] in ('Брокерская комиссия', 'Услуги сторонних организаций')):
+            commision += float(row['Объем транзакции'].replace(',', '.'))
+            if dateFrom > date.fromisoformat(row['Дата']):
+                dateFrom = date.fromisoformat(row['Дата'])
     except ValueError:
         continue   # явно: строку с нечисловым объёмом пропускаем
-commision = round(commision, 1)
-print('Общая комиссия за период с ',dateFrom,' по ',dateTo,' составила ',abs(commision), 'RUB')
+commision = abs(round(commision, 2))
+print('Общая комиссия за период с ',dateFrom,' по ',dateTo,' составила ',commision, 'RUB')
