@@ -26,17 +26,18 @@ with open('portfolio.csv', newline='', encoding = 'utf-8-sig') as f:
 
 #считаем сумму уплавченной комиссии
 commision = 0
-# так не делаем dateFrom = date.today()
+# так не делаем dateFrom = date.today() и так как сейчас не делаем = делаем через инициализацию в None
 dateFrom = date.fromisoformat(rows[0]['Дата'])
 dateTo = dateFrom
 for row in rows:
     try:
         if (row['Операция'] in ('Брокерская комиссия', 'Услуги сторонних организаций')):
             commision += float(row['Объем транзакции'].replace(',', '.'))
-            if dateFrom > date.fromisoformat(row['Дата']):
-                dateFrom = date.fromisoformat(row['Дата'])
-            if dateTo < date.fromisoformat(row['Дата']):
-                dateTo = date.fromisoformat(row['Дата'])
+        d = date.fromisoformat(row['Дата'])
+        if dateFrom > d:
+            dateFrom = d
+        if dateTo < d:
+            dateTo = d
     except ValueError:
         continue   # явно: строку с нечисловым объёмом пропускаем
 commision = abs(round(commision, 2))
