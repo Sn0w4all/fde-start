@@ -35,6 +35,8 @@ for row in rows:
             commision += float(row['Объем транзакции'].replace(',', '.'))
             if dateFrom > date.fromisoformat(row['Дата']):
                 dateFrom = date.fromisoformat(row['Дата'])
+            if dateTo < date.fromisoformat(row['Дата']):
+                dateTo = date.fromisoformat(row['Дата'])
     except ValueError:
         continue   # явно: строку с нечисловым объёмом пропускаем
 commision = abs(round(commision, 2))
