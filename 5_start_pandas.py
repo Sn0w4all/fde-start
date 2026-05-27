@@ -1,6 +1,27 @@
 import numpy as np
 import pandas as pd
 
+
+portfolio = pd.read_csv(
+    "portfolio.csv",
+    sep=';',
+    decimal=',',
+    encoding='utf-8-sig'
+)
+
+#portfolio.head(8)
+portfolio.dtypes
+portfolio.info()
+
+commission = portfolio[portfolio["Операция"].isin(['Брокерская комиссия', 'Услуги сторонних организаций'])]
+#portfolio.to_excel("titanic.xlsx", sheet_name="passengers", index=False)
+#commission.head(12)
+#commission["Объем транзакции"].describe()
+abs(commission["Объем транзакции"].sum())
+commission.groupby("Операция")["Объем транзакции"].sum()
+
+# эксперименты с датафреймами и сериями
+
 s = pd.Series([1, 3, 5, np.nan, 6, 8])
 print(s)
 
