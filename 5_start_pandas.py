@@ -2,30 +2,10 @@ import numpy as np
 import pandas as pd
 
 
-portfolio = pd.read_csv(
-    "portfolio.csv",
-    sep=';',
-#    decimal=',',
-    encoding='utf-8-sig'
-)
 
-#portfolio.head(8)
-portfolio.dtypes
-portfolio.info()
 
 try:
-#portfolio["Объем транзакции"] = portfolio["Объем транзакции"].str.replace('+','')
-    portfolio["Объем транзакции"] = portfolio["Объем транзакции"].str.replace(',','.').astype(float)
 
-    commission = portfolio[portfolio["Операция"].isin(['Брокерская комиссия', 'Услуги сторонних организаций'])]
-    #portfolio.to_excel("titanic.xlsx", sheet_name="passengers", index=False)
-    #commission.head(12)
-    #commission["Объем транзакции"].describe()
-    sumComission = abs(commission["Объем транзакции"].sum())
-    commission.groupby("Операция")["Объем транзакции"].sum()
-    print(sumComission)
-
-    # эксперименты с датафреймами и сериями
 
     s = pd.Series([1, 3, 5, np.nan, 6, 8])
 
@@ -45,17 +25,18 @@ try:
                         'F': 'foo'})
 
 
-    #print(df2.head())
-    #print('')
-    #print(df2.to_numpy()) #массив с одним типом строк - object c разными типами данных
-    #print('')
-    #print(df.to_numpy()) #массив с одним типом строк - object с int-ом (оптимизация типов данных)
+    print(df2.head())
+    print('')
+    print(df2.to_numpy()) #массив с одним типом строк - object c разными типами данных
+    print('')
+    print(df.to_numpy()) #массив с одним типом строк - object с int-ом (оптимизация типов данных)
 
-    #print(df2.dtypes)
-    #df=df.T
+    print(df2.dtypes)
     df.sort_values(by='B')
+    df=df.T
+    print(df)
 
 
 
 except ValueError: 
-    print('Битый файл')
+    print('Bye')
