@@ -17,4 +17,4 @@ message = client.messages.create(
     ],
     model="claude-haiku-4-5"
 )
-print(message.content)
+print(message.content[0].text)
