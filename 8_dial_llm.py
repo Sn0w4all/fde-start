@@ -18,21 +18,18 @@ def chat(text):
         model="claude-haiku-4-5"
     )
     answer = message.content[0].text
-    if message.content[0].stop_reason == 'end_turn':
+    if message.stop_reason == 'end_turn':
         messages.append({"role": "assistant", "content":answer})
         return answer   
     else:
         return ''
 
-for i in range(0,12,3):
+for i in range(0,12,1):
     print('Твой ввод №', str(i),':')
-    input = input()
+    user_input = input()
     answer = chat(input)
     if answer != "":
-        print('Ответ LLM:', answer) 
-        #попробовать 2 ввода ебануть
-        #print('Ответ LLM:', answer) 
-        
+        print('Ответ LLM:', answer)         
     else:
         print('Токены закончились')
         break
