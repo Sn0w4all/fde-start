@@ -11,7 +11,7 @@ client = Anthropic(
 portfolio = pd.read_csv(
     "portfolio.csv",
     sep=';',
-#    decimal=',',
+    decimal=',',
     encoding='utf-8-sig'
 )
 
@@ -21,7 +21,8 @@ def chat(text):
     messages.append({"role": "user", "content":text})
     
     message = client.messages.create(
-        max_tokens=1024,
+        system= "Ты - финансовый аналитик, который комментирует транзакции в портфеле. Ты должен давать краткие и информативные комментарии к каждой транзакции, основываясь на предоставленных данных. Твой ответ должен быть не более 15 слов и должен содержать ключевые моменты, включая возможные последствия для портфеля. Не используй длинные -",
+        max_tokens=200,
         messages= messages,
         model="claude-haiku-4-5"
     )
@@ -32,7 +33,7 @@ def chat(text):
     else:
         return ''
 
-for i in range(1,12,1):
+for i in range(0,3,1):
     user_input = 'Прокомментируй мне эту транзакцию' + portfolio.loc[i].to_string()
     #user_input = input()
     answer = chat(user_input)

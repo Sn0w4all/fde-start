@@ -1,0 +1,48 @@
+import os
+import pandas as pd
+from anthropic import Anthropic
+from dotenv import load_dotenv
+load_dotenv("claude_api.env")
+
+client = Anthropic(
+    api_key=os.environ.get("ANTHROPIC_API_KEY"),  # This is the default and can be omitted
+)
+
+portfolio = pd.read_csv(
+    "portfolio.csv",
+    sep=';',
+    decimal=',',
+    encoding='utf-8-sig'
+)
+
+messages = []
+
+def chat(text):
+    messages.append({"role": "user", "content":text})
+    
+    message = client.messages.create(
+        system= "Ты - финансовый аналитик, который комментирует транзакции в портфеле. Ты должен давать краткие и информативные комментарии к каждой транзакции, основываясь на предоставленных данных. Твой ответ должен быть не более 15 слов и должен содержать ключевые моменты, включая возможные последствия для портфеля. Не используй длинные -",
+        max_tokens=200,
+        messages= messages,
+        model="claude-haiku-4-5"
+    )
+    answer = message.content[0].text
+    if message.stop_reason == 'end_turn':
+        messages.append({"role": "assistant", "content":answer})
+        return answer   
+    else:
+        return ''
+
+for i in range(0,3,1):
+    print('Роль:')
+    user_input = input()
+    user_input = 'Прокомментируй мне эту транзакцию, представь что я' + str(user_input) + portfolio.loc[i].to_string()
+    #user_input = input()
+    answer = chat(user_input)
+    if answer != "":
+        print('Ответ LLM:',str(i), answer)         
+    else:
+        print('Токены закончились')
+        break
+
+print('Сессия закончилась')
