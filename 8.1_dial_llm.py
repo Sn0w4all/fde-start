@@ -3,7 +3,7 @@ import pandas as pd
 from anthropic import Anthropic
 from dotenv import load_dotenv
 load_dotenv("claude_api.env")
-
+#простой вод вывод. вызов АПИ и системный промт
 client = Anthropic(
     api_key=os.environ.get("ANTHROPIC_API_KEY"),  # This is the default and can be omitted
 )
