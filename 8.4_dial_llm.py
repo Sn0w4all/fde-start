@@ -18,30 +18,12 @@ client = anthropic.Anthropic(
     http_client=http_client
 )
 
-def get_article_content(url):
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.content, "html.parser")
-        article = soup.find("div", class_="mw-body-content")
-        if article:
-            content = "\n".join(p.text for p in article.find_all("p"))
-            return content[:1000] 
-        else:
-            return ""
-    except Exception as e:
-        print(f"Error scraping {url}: {e}")
-        return ""
-    
 class ArticleSummary(BaseModel):
     name: str
     born: str
     fame: str
     prize: int
     death: str
-
-
-
 
 def get_article_summary(text: str):
     if not text: return None
@@ -50,8 +32,9 @@ def get_article_summary(text: str):
         response = client.messages.parse(
             model="claude-sonnet-4-6",
             max_tokens=200,
+            tools=[{"type": "web_search_20260209", "name": "web_search"}],
             messages=[
-                {"role": "user", "content": f"Summarize this article:\n\n{text}"}
+                {"role": "user", "content": f"Search key facts about:\n\n{text}"}
             ],
             output_format=ArticleSummary
         )
@@ -68,24 +51,19 @@ def get_article_summary(text: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Парсит статьи Wikipedia и делает структурное саммари через Claude"
+        description="Ищет в интернете и делает структурное саммари через Claude"
     )
     parser.add_argument(
-        "urls",
+        "person",
         nargs="+",                       # одна или больше ссылок (минимум одна обязательна)
-        help="один или несколько URL статей Wikipedia",
+        help="одна или несколько персон которые тебе интересны",
     )
     args = parser.parse_args()
 
     print("Scraping and analyzing articles...")
-    for i, url in enumerate(args.urls):
-        print(f"\n--- Processing Article {i+1} ---")   # ← тут был баг: не хватало f
-        content = get_article_content(url)
-
-        if not content:                  # guard clause: отсекаем плохой случай сразу
-            print("Skipping (No content)")
-            continue
-        summary = get_article_summary(content)
+    for i, person in enumerate(args.person):
+        print(f"\n--- Processing person {i+1} ---")   # ← тут был баг: не хватало f
+        summary = get_article_summary(person)
         if summary:
             print(f"Scientist: {summary.name}")
             print(f"Born:      {summary.born}")
