@@ -30,6 +30,7 @@ def get_article_summary(text: str):
             model="claude-sonnet-4-6",
             max_tokens=200,
             tools=[{"type": "web_search_20260209", "name": "web_search"}],
+            tool_choice={"type": "auto"},
             messages=[
                 {"role": "user", "content": f"Search key facts about:\n\n{text}"}
             ],
