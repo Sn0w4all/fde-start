@@ -56,10 +56,7 @@ tools = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "city": {"type": "string"},
-                "temperature": {"type": "string", "enum": ["celsius", "fahrenheit"]},
-                "wind": {"type": "integer"},
-                "rainy": {"type": "string"}
+                "city": {"type": "string", "description": "City name to get weather for"}
             },
             "required": ["city"],
         },
@@ -70,9 +67,7 @@ tools = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "city": {"type": "string"},
-                "traffic": {"type": "string"},
-                "briges_amount": {"type": "integer"},
+                "city": {"type": "string", "description": "City name to get road traffic for"}
             },
             "required": ["city"],
         },
@@ -85,7 +80,7 @@ def get_weather_today(text: str):
     
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-6",
+            model="claude-haiku-4-5",
             max_tokens=200,
             tools=tools,
             messages=[
@@ -95,15 +90,32 @@ def get_weather_today(text: str):
                 }
             ],
         )
-        tool_use = next(block for block in response.content if block.type == "tool_use")
+        tool_use = next((block for block in response.content if block.type == "tool_use"), None)
+        #print(tool_use)
+        if tool_use is None:
+        # Claude решил не вызывать инструмент — это нормальный случай, не ошибка
+            text_block = next((b for b in response.content if b.type == "text"), None)
+            print("Claude не вызвал инструмент. Ответ:", text_block.text if text_block else "(пусто)")
+            return None
+        # Случай 2: вызвал — но НУЖНО проверить, какой именно
+        if tool_use.name == "get_weather_in_my_city":
+            result = fetch_weather(tool_use.input["city"])
+        elif tool_use.name == "get_roadtraffic_in_my_city":
+            # пока не реализовано — честно говорим об этом, а не делаем вид
+            print(f"Инструмент {tool_use.name} пока не поддерживается")
+            return None
+        else:
+            # Claude вызвал что-то, чего мы не знаем — не угадываем
+            print(f"Неизвестный инструмент: {tool_use.name}")
+            return None
+
         #result = {"event_id": "evt_123", "status": "created"} #заглушка может выглядеть так. 
-        result = fetch_weather(tool_use.input["city"])
-        print(response)
-        print(result)
+     
+
         # The API returns the JSON directly in the text content
 
         weather = client.messages.parse(
-            model="claude-sonnet-4-6",
+            model="claude-haiku-4-5",
             max_tokens=200,
             tools=tools,
             tool_choice={"type": "auto", "disable_parallel_tool_use": True},
