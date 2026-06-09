@@ -4,7 +4,7 @@ import os
 from pydantic import BaseModel
 import argparse
 from pathlib import Path
-import json
+import json 
 import requests
 from dotenv import load_dotenv
 
@@ -48,7 +48,7 @@ class WeatherToday(BaseModel):
     rainy: Optional[str] = None  
 
 
-# Клод сопоставляет тут по name, description и даже properties - если чтото похожее клод пойдет в поля схемы и если там про погоду найдет что можно использовать этот тул.
+# Клод сопоставляет тут по name, description и даже properties - если чтото похожее claud пойдет в поля схемы и если там про погоду найдет что можно использовать этот тул.
 tools = [
     {
         "name": "get_weather_in_my_city",
