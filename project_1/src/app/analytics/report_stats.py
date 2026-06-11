@@ -3,8 +3,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 SCRIPT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
+
 load_dotenv(SCRIPT_DIR / "claude_api.env")
 client = anthropic.Anthropic(
     api_key=os.environ.get("ANTHROPIC_API_KEY"),
@@ -26,11 +30,12 @@ def get_analysis(data, position):
             "Position": position,
             "Comment": comment.content[0].text
         }
+        logger.info("Сгенерирован комментарий для позиции %s", position)
         return result
 
     except anthropic.BadRequestError as e:
-        print(f"API Error: {e}")
+        logger.error("API Error: %s", e)
         return None
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error("Unexpected error: %s", e)
         return None

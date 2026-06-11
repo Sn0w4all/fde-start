@@ -1,0 +1,13 @@
+2026-06-11 12:42:42,138 | INFO     | __main__ | Starting the application
+2026-06-11 12:42:42,695 | INFO     | loaders.data_loader | Successfully loaded data for ticker GLDRUB_TOM
+2026-06-11 12:42:43,267 | INFO     | loaders.data_loader | Successfully loaded data for ticker CNYRUB_TOM
+2026-06-11 12:42:43,271 | INFO     | storage.repository | Saving raw data to /Users/antonzotov/dev/fde-start/project_1/data/raw_2026-06-11/data_12-42-43.json
+2026-06-11 12:42:43,271 | INFO     | transformers.normalize | Added normalized entry for ticker GLDRUB_TOM
+2026-06-11 12:42:43,271 | INFO     | transformers.normalize | Added normalized entry for ticker CNYRUB_TOM
+2026-06-11 12:42:43,272 | INFO     | storage.repository | Saving normalized data to /Users/antonzotov/dev/fde-start/project_1/data/normalized_2026-06-11/data_12-42-43.json
+2026-06-11 12:42:46,156 | INFO     | httpx | HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-11 12:42:46,187 | INFO     | analytics.report_stats | Сгенерирован комментарий для позиции GLDRUB_TOM
+2026-06-11 12:42:48,872 | INFO     | httpx | HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-11 12:42:48,875 | INFO     | analytics.report_stats | Сгенерирован комментарий для позиции CNYRUB_TOM
+2026-06-11 12:42:48,876 | INFO     | storage.repository | Saving reports data to /Users/antonzotov/dev/fde-start/project_1/data/reports_2026-06-11/data_12-42-48.json
+2026-06-11 12:42:48,877 | INFO     | __main__ | Finished the application
