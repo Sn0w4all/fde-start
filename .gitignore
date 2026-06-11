@@ -11,3 +11,6 @@ __pycache__/
 
 # Системный мусор macOS
 *.DS_Store
+
+# Логи
+*.log

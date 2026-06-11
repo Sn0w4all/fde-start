@@ -18,11 +18,11 @@ def get_analysis(data, position):
     try:
         comment = client.messages.create(
             model="claude-haiku-4-5",
-            max_tokens=200,
+            max_tokens=1200,
             messages=[
                 {
                     "role": "user", 
-                    "content": f"Ты финансовый аналитик,  прокомментируй по активу {position} значения цены сегодня: {json.dumps(data, ensure_ascii=False, indent=2)}.  Что это может означать для трейдера?"
+                    "content": f"Ты финансовый аналитик,  опиши и прокомментируй(без рекомендаций) по активу {position} значения цены сегодня: {json.dumps(data, ensure_ascii=False, indent=2)}.  Что это может означать для трейдера?"
                 }
             ],
         )

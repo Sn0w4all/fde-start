@@ -1,16 +1,21 @@
 #импорт модулей проекта
-import config as config
-import loaders.data_loader as data_loader
-import transformers.normalize as normalize
-import storage.repository as repository
-import analytics.report_stats as report_stats
+
+from . import config
+from .loaders import data_loader
+from .transformers import normalize
+from .storage import repository
+from .analytics import report_stats
+# запуск: 
+# cd /Users/antonzotov/dev/fde-start/project_1/src
+# python -m app.main
+
 
 #экспеиментируем с логированием
 import logging
 #вариант по времени
 from logging.handlers import TimedRotatingFileHandler
 handler = TimedRotatingFileHandler(
-    "project_1/app.log",
+    "app.log",
     when="midnight", #каждый день
     backupCount=3,               # храним 3 старых файла, остальное удаляется
     encoding="utf-8",

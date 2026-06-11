@@ -16,19 +16,19 @@ def normalize_data(raw_data):
         low_index = columns.index("LOW")  # найти индекс колонки LOW
         now_index = columns.index("LAST")  # найти индекс колонки CLOSE
         systime_index = columns.index("SYSTIME")  # найти индекс колонки SYSTIME
-        
+        boardid_index = columns.index("BOARDID")
         for entry in data:
-            if entry[columns.index("BOARDID")] != "CETS":
+            if entry[boardid_index] != "CETS":
                 continue
-            normalized_entry = {
+            normalized_data[ticker].append({
                 "date": entry[systime_index],
                 "low": entry[low_index],
-                "high": entry[high_index],  #найти индекс колонки HIGH
+                "high": entry[high_index],
                 "now": entry[now_index],
-            }
-            if not normalized_data[ticker]:
-                normalized_data[ticker].append(normalized_entry)
-                logger.info("Added normalized entry for ticker %s", ticker)
+            })
+            logger.info("Added normalized entry for ticker %s", ticker)
+            break  # берём первую актуальную строку CETS и выходим
+                
     return normalized_data
 
 

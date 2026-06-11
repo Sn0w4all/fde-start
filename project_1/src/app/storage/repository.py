@@ -13,5 +13,5 @@ def save_data(data, data_type = "raw"):
     path = folder / f"data_{time}.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    logger.info(f"Saving %s data to %s", data_type, path)
+    logger.info("Saving %s data to %s", data_type, path)
     
