@@ -7,6 +7,24 @@ import analytics.report_stats as report_stats
 
 #экспеиментируем с логированием
 import logging
+#вариант по времени
+from logging.handlers import TimedRotatingFileHandler
+handler = TimedRotatingFileHandler(
+    "app.log",
+    when="midnight", #каждый день
+    backupCount=3,               # храним 3 старых файла, остальное удаляется
+    encoding="utf-8",
+)
+
+#вариант по размеру
+# from logging.handlers import RotatingFileHandler
+# handler = RotatingFileHandler(
+#     "app.log",
+#     maxBytes=1 * 1024 * 1024,   # 1 МБ — порог, после которого ротируем
+#     backupCount=3,               # храним 3 старых файла, остальное удаляется
+#     encoding="utf-8",
+# )
+
 logger = logging.getLogger(__name__)
 tickers = ["GLDRUB_TOM", "CNYRUB_TOM"] ##не забыть найти где находятся тикеры "SiZ6, "GDZ6"
 
@@ -15,7 +33,7 @@ def setup_logging():
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
         handlers=[
-            logging.FileHandler("app.log", encoding="utf-8"),
+            handler,
             logging.StreamHandler(),
         ],
     )
