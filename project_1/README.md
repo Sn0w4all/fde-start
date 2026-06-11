@@ -16,10 +16,18 @@
 Что лежит в папке:
 1. README.md
 2.  Модули основного проекта
-    Главный
-    Сбор и упаковка
-    Аналитика
+    - main.py — точка входа, собирает весь пайплайн по шагам.
+    - config.py — читает параметры: URL, токены, пути, режимы запуска.
+    - # logger.py — единый логгер для всех модулей.
+    - connectors/api_client.py — подключение к внешнему API или БД.
+    - loaders/data_loader.py — получение сырых данных.
+    - transformers/normalize.py — очистка, типизация, переименование, дедупликация.
+    - storage/repository.py — сохранение raw/processed данных.
+    - # analytics/report_stats.py — расчеты, метрики, агрегации.
+    - reports/report_builder.py — сборка Excel, CSV, HTML или PDF отчета.
 3. Тестовые данные и юнит тесты.
+
+
 
 
 
