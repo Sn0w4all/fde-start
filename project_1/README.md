@@ -19,17 +19,12 @@
 2.  Модули основного проекта
     - main.py — точка входа, собирает весь пайплайн по шагам.
     - config.py — читает параметры: URL, токены, пути, режимы запуска.
-    - # logger.py — единый логгер для всех модулей.
     - loaders/data_loader.py — получение сырых данных.
-    - storage/repository.py — сохранение raw/processed данных.
+    - storage/repository.py —  сохранение данных.
     - transformers/normalize.py — очистка, типизация, переименование, дедупликация.
-    - # analytics/report_stats.py — расчеты, метрики, агрегации.
-    - reports/report_builder.py — сборка Excel, CSV, HTML или PDF отчета.
-3. Тестовые данные и юнит тесты.
-
-
-Команды для запуска:
-
+    - analytics/report_stats.py — получение базового коммента от LLM.расчеты, метрики, агрегации пока не делаем.
+    - # (пока не делаем) reports/report_builder.py — сборка Excel, CSV, HTML или PDF отчета.
+3. # (пока не делаем) Тестовые данные и юнит тесты.
 
 
 

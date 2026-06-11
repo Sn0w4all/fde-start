@@ -10,7 +10,7 @@ import logging
 #вариант по времени
 from logging.handlers import TimedRotatingFileHandler
 handler = TimedRotatingFileHandler(
-    "app.log",
+    "project_1/app.log",
     when="midnight", #каждый день
     backupCount=3,               # храним 3 старых файла, остальное удаляется
     encoding="utf-8",
