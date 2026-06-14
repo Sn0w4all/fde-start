@@ -1,0 +1,23 @@
+2026-06-14 23:12:55,134 | INFO     | __main__ | Starting the application
+2026-06-14 23:14:50,396 | INFO     | __main__ | Starting the application
+2026-06-14 23:14:53,241 | INFO     | app.loaders.data_loader | Successfully loaded data for ticker GLDRUB_TOM
+2026-06-14 23:14:53,817 | INFO     | app.loaders.data_loader | Successfully loaded data for ticker CNYRUB_TOM
+2026-06-14 23:14:53,825 | INFO     | app.storage.repository | Saving raw data to /Users/antonzotov/dev/fde-start/project_1/data/raw_2026-06-14/data_23-14-53.json
+2026-06-14 23:14:53,825 | INFO     | app.transformers.normalize | Added normalized entry for ticker GLDRUB_TOM
+2026-06-14 23:14:53,825 | INFO     | app.transformers.normalize | Added normalized entry for ticker CNYRUB_TOM
+2026-06-14 23:14:53,826 | INFO     | app.storage.repository | Saving normalized data to /Users/antonzotov/dev/fde-start/project_1/data/normalized_2026-06-14/data_23-14-53.json
+2026-06-14 23:15:01,402 | INFO     | httpx | HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-14 23:15:01,434 | INFO     | app.analytics.report_stats | Сгенерирован комментарий для позиции GLDRUB_TOM
+2026-06-14 23:15:07,240 | INFO     | httpx | HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-06-14 23:15:07,243 | INFO     | app.analytics.report_stats | Сгенерирован комментарий для позиции CNYRUB_TOM
+2026-06-14 23:15:07,245 | INFO     | app.storage.repository | Saving reports data to /Users/antonzotov/dev/fde-start/project_1/data/reports_2026-06-14/data_23-15-07.json
+2026-06-14 23:15:07,245 | INFO     | __main__ | Finished the application
+2026-06-14 23:56:57,763 | INFO     | __main__ | Starting the application
+2026-06-14 23:57:00,621 | INFO     | app.loaders.data_loader | Successfully loaded data for ticker GLDRUB_TOM
+2026-06-14 23:57:01,152 | INFO     | app.loaders.data_loader | Successfully loaded data for ticker CNYRUB_TOM
+2026-06-14 23:57:01,156 | INFO     | app.storage.repository | Saving raw data to /Users/antonzotov/dev/fde-start/project_1/data/raw_2026-06-14/data_23-57-01.json
+2026-06-14 23:58:03,702 | INFO     | __main__ | Starting the application
+2026-06-14 23:58:04,196 | INFO     | app.loaders.data_loader | Successfully loaded data for ticker GLDRUB_TOM
+2026-06-14 23:58:04,704 | INFO     | app.loaders.data_loader | Successfully loaded data for ticker CNYRUB_TOM
+2026-06-14 23:58:04,708 | INFO     | app.storage.repository | Saving raw data to /Users/antonzotov/dev/fde-start/project_1/data/raw_2026-06-14/data_23-58-04.json
+2026-06-14 23:58:04,710 | WARNING  | app.storage.repository | JSON файлов нет в /Users/antonzotov/dev/fde-start/project_1/data
