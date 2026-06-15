@@ -1,0 +1,32 @@
+[project]
+name = "html-bot"
+version = "0.1.0"
+description = "Stateless Telegram agent that generates self-contained HTML from text and/or images"
+requires-python = ">=3.12"
+dependencies = [
+    "aiogram>=3.13",
+    "aiosqlite>=0.20",
+    "anthropic>=0.40",
+    "playwright>=1.48",
+    "Pillow>=11.0",
+    "pydantic-settings>=2.6",
+    "structlog>=24.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bot*", "core*", "storage*"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
