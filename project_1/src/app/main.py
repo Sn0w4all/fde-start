@@ -73,7 +73,7 @@ def main():
     for config_iis in config_list:
         raw_data.update(data_loader.load_data(config_iis))
     repository.save_data(raw_data, "raw") # Сырые данные складываем в data
-"""  normalized_data = normalize.normalize_data(raw_data) # Трансформируем данные
+    normalized_data = normalize.normalize_data(raw_data) # Трансформируем данные
     repository.save_data(normalized_data, "normalized") # Готовые данные складываем в data
     reports = []
     for position, data in normalized_data.items():
@@ -81,7 +81,7 @@ def main():
         reports.append(report)
     repository.save_data(reports, "reports") # Сохраняем отчеты в data
     logger.info("Finished the application")
-"""
+
 # Пишем лог файл
 
 if __name__ == "__main__":
