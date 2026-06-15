@@ -43,8 +43,10 @@ if [ -f ops/HEAL_OK ]; then
   rm -f ops/HEAL_OK
   touch ops/PENDING_DEPLOY
   say "FIX READY (tests green). PENDING_DEPLOY set. Awaiting human deploy."
-  bash ops/notify.sh "🛠 HTML-bot: auto-fix ready, tests GREEN. Review ops/heal_report.md, then run ops/deploy.sh to ship. (snapshot: $SNAP)"
+  REPORT="$(head -c 1500 ops/heal_report.md 2>/dev/null || echo '(no report)')"
+  bash ops/notify.sh "$(printf '🛠 HTML-bot: AUTO-FIX READY, tests GREEN.\n\n--- cause + fix ---\n%s\n\n✅ approve+deploy:\n  ssh root@5.39.253.253 '\''cd /opt/html-bot && ops/deploy.sh'\''\n↩️ reject:\n  ssh root@5.39.253.253 '\''cd /opt/html-bot && ops/rollback.sh --code'\''' "$REPORT")"
 else
   say "no green fix produced this run"
-  bash ops/notify.sh "⚠️ HTML-bot: errors detected, auto-fix did NOT pass tests. Manual check needed. See ops/heal.log / ops/heal_report.md."
+  ERRSNIP="$(head -c 800 ops/errors.txt 2>/dev/null || true)"
+  bash ops/notify.sh "$(printf '⚠️ HTML-bot: errors detected (%s lines), auto-fix did NOT pass tests. Manual check needed.\n\n--- sample ---\n%s' "$COUNT" "$ERRSNIP")"
 fi
