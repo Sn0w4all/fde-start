@@ -31,7 +31,29 @@ handler = TimedRotatingFileHandler(
 # )
 
 logger = logging.getLogger(__name__)
-tickers = ["GLDRUB_TOM", "CNYRUB_TOM"] ##не забыть найти где находятся тикеры "SiZ6, "GDZ6"
+interest = [
+    {
+        'ticker': 'GLDRUB_TOM',
+        'engine': 'currency',
+        'market': 'selt'
+    }, 
+    {
+        'ticker': 'CNYRUB_TOM',
+        'engine': 'currency',
+        'market': 'selt'
+    },
+    {
+        'ticker': 'SiZ6',
+        'engine': 'futures',
+        'market': 'forts'
+
+    },   
+    {
+        'ticker': 'GDZ6',
+        'engine': 'futures',
+        'market': 'forts'
+    }
+] 
 
 def setup_logging():
     logging.basicConfig(
@@ -44,13 +66,14 @@ def setup_logging():
     )
 
 
-
 def main():
     logger.info("Starting the application")
-    config_iis = config.get_config(tickers) # Получаем конфиг
-    raw_data = data_loader.load_data(config_iis) # Подключаемся к IIS MOEX и забираем данные.
+    config_list = config.get_config(interest) # Получаем конфиги для каждого интереса
+    raw_data = {}
+    for config_iis in config_list:
+        raw_data.update(data_loader.load_data(config_iis))
     repository.save_data(raw_data, "raw") # Сырые данные складываем в data
-    normalized_data = normalize.normalize_data(raw_data) # Трансформируем данные
+"""  normalized_data = normalize.normalize_data(raw_data) # Трансформируем данные
     repository.save_data(normalized_data, "normalized") # Готовые данные складываем в data
     reports = []
     for position, data in normalized_data.items():
@@ -58,7 +81,7 @@ def main():
         reports.append(report)
     repository.save_data(reports, "reports") # Сохраняем отчеты в data
     logger.info("Finished the application")
-
+"""
 # Пишем лог файл
 
 if __name__ == "__main__":

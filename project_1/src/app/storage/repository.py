@@ -43,7 +43,7 @@ def load_latest_data(data_type  = "raw"):
     
     # Находим самый свежий файл
     latest_file = max(json_files, key=lambda p: p.stat().st_mtime)
-    
+    # Вытаскиваем данные из него
     try:
         with open(latest_file, "r", encoding="utf-8") as f:
             data = json.load(f)

@@ -23,7 +23,7 @@ def normalize_data(raw_data):
         systime_index = columns.index("SYSTIME")  # найти индекс колонки SYSTIME
         boardid_index = columns.index("BOARDID")
         for entry in data:
-            if entry[boardid_index] != "CETS":
+            if entry[boardid_index] != "CETS" or entry[boardid_index] != "RFUD":
                 continue
             new_normalized_data = {
                 "date": entry[systime_index],
