@@ -75,10 +75,7 @@ def main():
     repository.save_data(raw_data, "raw") # Сырые данные складываем в data
     normalized_data = normalize.normalize_data(raw_data) # Трансформируем данные
     repository.save_data(normalized_data, "normalized") # Готовые данные складываем в data
-    reports = []
-    for position, data in normalized_data.items():
-        report = report_stats.get_analysis(data, position) # Анализируем данные 
-        reports.append(report)
+    reports = report_stats.get_analysis(normalized_data) # Анализируем данные 
     repository.save_data(reports, "reports") # Сохраняем отчеты в data
     logger.info("Finished the application")
 

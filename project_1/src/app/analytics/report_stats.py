@@ -14,24 +14,27 @@ client = anthropic.Anthropic(
     api_key=os.environ.get("ANTHROPIC_API_KEY"),
 )
 
-def get_analysis(data, position):
+def get_analysis(normalized_data):
+    reports = []
     try:
-        comment = client.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=1200,
-            messages=[
-                {
-                    "role": "user", 
-                    "content": f"Ты финансовый аналитик,  опиши и прокомментируй(без рекомендаций) по активу {position} значения цены сегодня: {json.dumps(data, ensure_ascii=False, indent=2)}.  Что это может означать для трейдера?"
-                }
-            ],
-        )
-        result = {
-            "Position": position,
-            "Comment": comment.content[0].text
-        }
-        logger.info("Сгенерирован комментарий для позиции %s", position)
-        return result
+        for position, data in normalized_data.items():
+            comment = client.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=1200,
+                messages=[
+                    {
+                        "role": "user", 
+                        "content": f"Ты финансовый аналитик,  опиши и прокомментируй(без рекомендаций) по активу {position} значения цены сегодня: {json.dumps(data, ensure_ascii=False, indent=2)}.  Что это может означать для трейдера? Используй для оценки корреляции следующие значения {normalized_data}"
+                    }
+                ],
+            )
+            report = {
+                "Position": position,
+                "Comment": comment.content[0].text
+            }
+            reports.append(report)
+            logger.info("Сгенерирован комментарий для позиции %s", position)
+        return reports
 
     except anthropic.BadRequestError as e:
         logger.error("API Error: %s", e)
