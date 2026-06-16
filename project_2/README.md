@@ -9,7 +9,7 @@ conversation context is stored. Only the fact of a user's authorization persists
 | Input | Branch | What happens |
 |-------|--------|--------------|
 | text only | `TEXT2HTML` | Claude generates one self-contained HTML file; rendered + validated (up to 2 retries on error). |
-| photo only | `IMG2HTML` | Vision reconstruction → render → tile-diff diagnostics → global iterative correction → final validation. |
+| photo only | `IMG2HTML` | Vision reconstruction → render → tile-diff diagnostics → global iterative correction → final validation. Correction runs as one **prompt-cached conversation** (original image + prior HTML stay in history → iterations 2+ re-read them at ~0.1× and the HTML is never re-pasted), plus a cheap "already close enough" gate that skips paid corrections. |
 | text + photo | both | Runs both branches, returns both results. |
 
 Reply for each result = the `.html` document **+** a PNG preview rendered with Playwright/Chromium.

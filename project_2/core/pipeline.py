@@ -40,9 +40,14 @@ async def run_text2html(renderer: Renderer, prompt: str) -> Artifact:
 async def run_img2html(
     renderer: Renderer, image_bytes: bytes, media_type: str
 ) -> Artifact:
-    """Reconstruct image as HTML with global iterative correction."""
-    # Step 1: initial reconstruction.
-    html = await llm.image_to_html(image_bytes, media_type)
+    """Reconstruct image as HTML with global iterative correction.
+
+    The correction loop runs as one cached conversation: the original image and
+    each prior HTML stay in history, so iterations 2+ re-read them at ~0.1x and
+    the current HTML is never re-pasted into the prompt.
+    """
+    # Step 1: initial reconstruction (opens the conversation).
+    html, messages = await llm.start_image_conversation(image_bytes, media_type)
     # Step 2: render.
     result = await renderer.render(html)
     render_png = result.png
@@ -59,19 +64,22 @@ async def run_img2html(
             overall=round(cmp.overall, 4),
             problems=cmp.problem_tiles,
         )
-        # Stop if no problem zones or divergence stopped falling.
-        if not cmp.problem_tiles or cmp.overall >= prev_overall:
+        # Stop if: already close enough (cheap gate — skip a paid correction),
+        # no problem zones, or divergence stopped falling.
+        if (
+            cmp.overall < settings.img_diff_threshold
+            or not cmp.problem_tiles
+            or cmp.overall >= prev_overall
+        ):
             break
         prev_overall = cmp.overall
 
-        # Step 4: global correction.
-        new_html = await llm.correct_html(
-            original=image_bytes,
-            original_type=media_type,
-            render=render_png,
+        # Step 4: global correction (appends a cached turn to the conversation).
+        new_html, messages = await llm.correct_in_conversation(
+            messages,
+            render_bytes=render_png,
             render_type="image/png",
             problem_tiles=cmp.problem_tiles,
-            current_html=html,
         )
         try:
             new_result = await renderer.render(new_html)

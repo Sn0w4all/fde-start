@@ -58,6 +58,21 @@ async def _call(system: str, content: list[dict] | str) -> str:
     return await with_backoff(_do, exc_types=_RETRY_EXC)
 
 
+async def _create(messages: list[dict]) -> str:
+    """Run a multi-turn create against the cached conversation prefix."""
+
+    async def _do() -> str:
+        msg = await _client.messages.create(
+            model=settings.model,
+            max_tokens=8192,
+            system=_DISCIPLINE,
+            messages=messages,
+        )
+        return _extract_text(msg)
+
+    return await with_backoff(_do, exc_types=_RETRY_EXC)
+
+
 def _image_block(image_bytes: bytes, media_type: str) -> dict:
     return {
         "type": "image",
@@ -67,6 +82,50 @@ def _image_block(image_bytes: bytes, media_type: str) -> dict:
             "data": base64.standard_b64encode(image_bytes).decode("ascii"),
         },
     }
+
+
+def _set_single_cache_breakpoint(messages: list[dict]) -> None:
+    """Keep exactly one cache_control breakpoint, on the last user content block.
+
+    Prompt caching is a prefix match, so one breakpoint on the latest user turn
+    lets every following request re-read the whole prior conversation (original
+    image + earlier HTML) at ~0.1x instead of full price.
+    """
+    for m in messages:
+        content = m.get("content")
+        if isinstance(content, list):
+            for block in content:
+                if isinstance(block, dict):
+                    block.pop("cache_control", None)
+    # mark the last user message's last content block
+    for m in reversed(messages):
+        if m.get("role") == "user" and isinstance(m.get("content"), list) and m["content"]:
+            last = m["content"][-1]
+            if isinstance(last, dict):
+                last["cache_control"] = {"type": "ephemeral"}
+            return
+
+
+def _correction_user_content(
+    render_bytes: bytes, render_type: str, problem_tiles: list[str]
+) -> list[dict]:
+    """Correction turn: original image + prior HTML already live in history, so
+    we only send the new render + the problem zones (no current_html re-paste)."""
+    zones = ", ".join(problem_tiles) if problem_tiles else "none"
+    return [
+        {"type": "text", "text": "CURRENT render of your previous HTML:"},
+        _image_block(render_bytes, render_type),
+        {
+            "type": "text",
+            "text": (
+                f"Problem zones (grid cells where the render diverges most from the "
+                f"ORIGINAL image shown earlier): {zones}.\n\n"
+                "Return the FULL corrected HTML document so the render matches the "
+                "original more closely. Same discipline: self-contained, no external "
+                "resources, no scripts."
+            ),
+        },
+    ]
 
 
 async def text_to_html(prompt: str, error_feedback: str | None = None) -> str:
@@ -80,43 +139,50 @@ async def text_to_html(prompt: str, error_feedback: str | None = None) -> str:
     return await _call(_DISCIPLINE, user)
 
 
-async def image_to_html(image_bytes: bytes, media_type: str) -> str:
-    """IMG2HTML step 1: reconstruct HTML that visually reproduces the image."""
-    content = [
-        _image_block(image_bytes, media_type),
+async def start_image_conversation(
+    image_bytes: bytes, media_type: str
+) -> tuple[str, list[dict]]:
+    """IMG2HTML step 1: reconstruct HTML from the image and open a conversation.
+
+    Returns (html, messages). The original image stays in ``messages`` so later
+    correction turns reuse it from the prompt cache instead of resending it.
+    """
+    messages: list[dict] = [
         {
-            "type": "text",
-            "text": "Reproduce this image as closely as possible as a web page. "
-            "Match layout, colors, typography and spacing.",
-        },
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "ORIGINAL target image:"},
+                _image_block(image_bytes, media_type),
+                {
+                    "type": "text",
+                    "text": "Reproduce this image as closely as possible as a web page. "
+                    "Match layout, colors, typography and spacing.",
+                },
+            ],
+        }
     ]
-    return await _call(_DISCIPLINE, content)
+    _set_single_cache_breakpoint(messages)
+    html = await _create(messages)
+    messages.append({"role": "assistant", "content": html})
+    return html, messages
 
 
-async def correct_html(
-    original: bytes,
-    original_type: str,
-    render: bytes,
+async def correct_in_conversation(
+    messages: list[dict],
+    render_bytes: bytes,
     render_type: str,
     problem_tiles: list[str],
-    current_html: str,
-) -> str:
-    """IMG2HTML step 4: global correction given original, current render, problem zones."""
-    zones = ", ".join(problem_tiles) if problem_tiles else "none"
-    content = [
-        {"type": "text", "text": "ORIGINAL target image:"},
-        _image_block(original, original_type),
-        {"type": "text", "text": "CURRENT render of your HTML:"},
-        _image_block(render, render_type),
-        {
-            "type": "text",
-            "text": (
-                f"Problem zones (grid cells where render diverges most): {zones}.\n\n"
-                f"Current HTML:\n{current_html}\n\n"
-                "Return the FULL corrected HTML document so the render matches the "
-                "original more closely. Same discipline: self-contained, no external "
-                "resources, no scripts."
-            ),
-        },
-    ]
-    return await _call(_DISCIPLINE, content)
+) -> tuple[str, list[dict]]:
+    """IMG2HTML step 4: append a correction turn to the existing conversation.
+
+    The original image and the prior HTML are already in ``messages`` (the latter
+    as the last assistant turn), so this turn only carries the new render + the
+    problem zones — and reads the cached prefix at ~0.1x.
+    """
+    messages.append(
+        {"role": "user", "content": _correction_user_content(render_bytes, render_type, problem_tiles)}
+    )
+    _set_single_cache_breakpoint(messages)
+    html = await _create(messages)
+    messages.append({"role": "assistant", "content": html})
+    return html, messages
