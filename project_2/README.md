@@ -66,7 +66,7 @@ uv run pytest                            # html-validator tests auto-skip if no 
 | `ADMIN_IDS` | comma/space separated tg ids (admin commands) |
 | `MODEL` | default `claude-sonnet-4-6` |
 | `MAX_IMAGE_MB` | reject larger images (default 10) |
-| `TASK_TIMEOUT_SEC` | per-task timeout (default 180) |
+| `TASK_TIMEOUT_SEC` | per-task timeout (default 600) |
 | `MAX_CONCURRENT_TASKS` | queue parallelism (default 3) |
 | `IMG_TILE_GRID` | diagnostic tile grid NxN (default 3) |
 | `IMG_DIFF_THRESHOLD` | per-tile divergence threshold (default 0.15) |

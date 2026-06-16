@@ -8,6 +8,8 @@ is the project root (`/opt/html-bot`). You run UNATTENDED. Be conservative.
 3. Diagnose the root cause of the errors. Ignore transient/network errors
    (rate limit, connection reset, API timeout) — those are already retried; do NOT
    "fix" them. Only act on real code defects (tracebacks, logic errors, crashes).
+   `task_timeout` (task exceeded TASK_TIMEOUT_SEC) is an operational/config matter —
+   NOT a code defect; do NOT try to fix it in code.
 4. If there is no real code defect to fix, write `NO_FIX_NEEDED` to `ops/heal_report.md`
    and STOP. Do not edit anything.
 5. Otherwise apply the smallest correct code fix.

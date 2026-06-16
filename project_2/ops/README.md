@@ -18,7 +18,7 @@ notifies you. You approve by running `deploy.sh`.
 ## Flow
 
 ```
-cron (daily) ─▶ selfheal.sh
+cron (*/30 min) ─▶ selfheal.sh
                  ├─ no errors ............................ exit
                  ├─ errors → claude fixes + tests (≤5)
                  │     ├─ green → touch PENDING_DEPLOY, notify you ──▶ you run deploy.sh
@@ -37,9 +37,9 @@ State files (in `ops/`):
 Node + Claude Code, then cron. See chat / `INSTALL` notes. Cron line:
 
 ```
-0 4 * * * ANTHROPIC_API_KEY='sk-ant-...' /opt/html-bot/ops/selfheal.sh 25h >> /opt/html-bot/ops/cron.log 2>&1
+*/30 * * * * ANTHROPIC_API_KEY='sk-ant-...' /opt/html-bot/ops/selfheal.sh 35m >> /opt/html-bot/ops/cron.log 2>&1
 ```
-(daily at 04:00 UTC, scanning the last 25h of logs)
+(every 30 min, scanning the last 35m of logs)
 
 ## Daily use
 

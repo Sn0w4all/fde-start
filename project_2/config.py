@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 
     # --- limits ---
     max_image_mb: int = 10
-    task_timeout_sec: int = 180
+    task_timeout_sec: int = 600
     max_concurrent_tasks: int = 3
 
     # --- image diagnostics ---
