@@ -121,4 +121,9 @@ docker compose down                                    # stop
 - Structured JSON logging of requests/errors; no PII or message content persisted.
 - Exponential backoff on network/API calls.
 - Stateless: only `users(tg_id, authorized_at)` is stored.
+- Failure reporting: each branch (text→HTML, image→HTML) runs independently — a
+  failure in one still delivers the other and names what failed. Task timeout or
+  an unexpected error sends the user an explicit notice (never silent).
+- Preview delivery: if a tall full-page PNG exceeds Telegram's photo limits, the
+  preview is sent as a file instead.
 ```

@@ -153,11 +153,28 @@ async def on_content(message: Message) -> None:
         return
 
     await message.answer("Got it, processing…")
-    _d().queue.submit(lambda: _process(message, route), name=f"gen-{uid}-{message.message_id}")
+
+    async def _notify_fail(reason: str) -> None:
+        if reason == "timeout":
+            await message.answer(
+                "⏳ Processing took too long and was stopped. Try a simpler request."
+            )
+        else:
+            await message.answer("⚠️ Something went wrong. Please try again.")
+
+    _d().queue.submit(
+        lambda: _process(message, route),
+        name=f"gen-{uid}-{message.message_id}",
+        on_error=_notify_fail,
+    )
 
 
 async def _process(message: Message, route: Route) -> None:
-    """Runs inside the task queue (bounded concurrency + timeout)."""
+    """Runs inside the task queue (bounded concurrency + timeout).
+
+    Each branch runs independently: a failure in one (e.g. image→HTML) still
+    delivers the other's result and reports exactly what failed.
+    """
     d = _d()
     text = (message.text or message.caption or "").strip()
 
@@ -177,22 +194,35 @@ async def _process(message: Message, route: Route) -> None:
             return
 
     artifacts: list[Artifact] = []
-    try:
-        if route in (Route.TEXT2HTML, Route.BOTH):
+    failures: list[str] = []
+
+    if route in (Route.TEXT2HTML, Route.BOTH):
+        try:
             artifacts.append(await pipeline.run_text2html(d.renderer, text))
-        if route in (Route.IMG2HTML, Route.BOTH):
-            assert image_bytes is not None
-            artifacts.append(await pipeline.run_img2html(d.renderer, image_bytes, media_type))
-    except Exception:
-        log.exception("generation_failed", route=route.value, user=message.from_user.id)
-        if not artifacts:
-            await message.answer(
-                "Could not generate a valid HTML page for this input. Please try again "
-                "or rephrase."
+        except Exception:
+            log.exception("text2html_failed", user=message.from_user.id)
+            failures.append("text→HTML")
+    if route in (Route.IMG2HTML, Route.BOTH):
+        assert image_bytes is not None
+        try:
+            artifacts.append(
+                await pipeline.run_img2html(d.renderer, image_bytes, media_type)
             )
+        except Exception:
+            log.exception("img2html_failed", user=message.from_user.id)
+            failures.append("image→HTML")
 
     for art in artifacts:
-        await _send_artifact(message, art)
+        try:
+            await _send_artifact(message, art)
+        except Exception:
+            log.exception("send_artifact_failed", kind=art.kind, user=message.from_user.id)
+            failures.append(f"{art.kind} (delivery)")
+
+    if failures:
+        await message.answer(
+            "⚠️ Could not produce: " + ", ".join(failures) + ". Try again or rephrase."
+        )
 
 
 async def _download_photo(bot: Bot, file_id: str) -> bytes:
@@ -210,8 +240,17 @@ async def _send_artifact(message: Message, art: Artifact) -> None:
             BufferedInputFile(html_path.read_bytes(), filename=html_path.name),
             caption=f"{art.kind}: HTML",
         )
-        await message.answer_photo(
-            BufferedInputFile(art.png, filename=f"{art.kind}.png"),
-            caption=f"{art.kind}: preview",
-        )
+        # Tall/large full-page screenshots can exceed Telegram's photo limits;
+        # fall back to sending the PNG as a document so the preview still arrives.
+        try:
+            await message.answer_photo(
+                BufferedInputFile(art.png, filename=f"{art.kind}.png"),
+                caption=f"{art.kind}: preview",
+            )
+        except Exception:
+            log.warning("preview_as_photo_failed", kind=art.kind)
+            await message.answer_document(
+                BufferedInputFile(art.png, filename=f"{art.kind}_preview.png"),
+                caption=f"{art.kind}: preview (sent as file)",
+            )
     # temp dir (and any intermediate files) removed on context exit
