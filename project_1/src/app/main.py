@@ -31,25 +31,29 @@ handler = TimedRotatingFileHandler(
 # )
 
 logger = logging.getLogger(__name__)
-interest = [
+interests = [
     {
         'ticker': 'GLDRUB_TOM',
+        'description': 'Бессрочный фьючерс - золото в рублях',
         'engine': 'currency',
         'market': 'selt'
     }, 
     {
         'ticker': 'CNYRUB_TOM',
+        'description': 'Бессрочный фьючерс - валютная пара: Юань / Рубль',
         'engine': 'currency',
         'market': 'selt'
     },
     {
         'ticker': 'SiZ6',
+        'description': 'Фьючерс со сроком экспирации в декабре - валютная пара: Доллар США / Рубль',
         'engine': 'futures',
         'market': 'forts'
 
     },   
     {
         'ticker': 'GDZ6',
+        'description': 'Фьючерс со сроком экспирации в декабре - золото в долларах США',
         'engine': 'futures',
         'market': 'forts'
     }
@@ -68,12 +72,12 @@ def setup_logging():
 
 def main():
     logger.info("Starting the application")
-    config_list = config.get_config(interest) # Получаем конфиги для каждого интереса
+    config_list = config.get_config(interests) # Получаем конфиги для каждого интереса
     raw_data = {}
     for config_iis in config_list:
         raw_data.update(data_loader.load_data(config_iis))
     repository.save_data(raw_data, "raw") # Сырые данные складываем в data
-    normalized_data = normalize.normalize_data(raw_data) # Трансформируем данные
+    normalized_data = normalize.normalize_data(raw_data, interests) # Трансформируем данные
     repository.save_data(normalized_data, "normalized") # Готовые данные складываем в data
     reports = report_stats.get_analysis(normalized_data) # Анализируем данные 
     repository.save_data(reports, "reports") # Сохраняем отчеты в data

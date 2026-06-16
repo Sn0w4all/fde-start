@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 def load_data(config):
     raw_data = {}
-    for base_ticker in config["tickers"]:
+    for base_ticker in config["ticker"]:
         url = config["endpoints"]["marketdata"]
         response = requests.get(url)
         if response.status_code == 200:
