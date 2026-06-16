@@ -8,6 +8,7 @@ import anthropic
 import structlog
 
 from config import settings
+from core.html_utils import extract_html_document
 from core.retry import with_backoff
 
 log = structlog.get_logger(__name__)
@@ -42,7 +43,9 @@ def _strip_markdown(text: str) -> str:
 
 def _extract_text(message: anthropic.types.Message) -> str:
     parts = [b.text for b in message.content if b.type == "text"]
-    return _strip_markdown("".join(parts))
+    # Deterministically slice out the standalone document — drops fences AND any
+    # commentary/preamble the model emitted around it (0 extra tokens).
+    return extract_html_document("".join(parts))
 
 
 async def _call(system: str, content: list[dict] | str) -> str:
@@ -181,6 +184,36 @@ async def correct_in_conversation(
     """
     messages.append(
         {"role": "user", "content": _correction_user_content(render_bytes, render_type, problem_tiles)}
+    )
+    _set_single_cache_breakpoint(messages)
+    html = await _create(messages)
+    messages.append({"role": "assistant", "content": html})
+    return html, messages
+
+
+async def regenerate_clean(
+    messages: list[dict], reason: str
+) -> tuple[str, list[dict]]:
+    """Fallback: ask the model to resend ONLY the HTML document, no commentary.
+
+    Used when the prior reply failed final validation (e.g. it contained no
+    recognizable document). Runs on the cached conversation, so it is cheap.
+    """
+    messages.append(
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        f"Your previous reply did not validate ({reason}). Resend ONLY "
+                        "the complete, valid HTML document — start with <!DOCTYPE html>, "
+                        "end with </html>, with no commentary, explanation, or any text "
+                        "outside the document."
+                    ),
+                }
+            ],
+        }
     )
     _set_single_cache_breakpoint(messages)
     html = await _create(messages)

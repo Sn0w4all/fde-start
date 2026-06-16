@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 import structlog
 from playwright.async_api import Browser, async_playwright
 
+from core.html_utils import looks_like_html_document
+
 log = structlog.get_logger(__name__)
 
 
@@ -81,7 +83,16 @@ class Renderer:
 
 
 async def validate(renderer: Renderer, html: str) -> RenderResult:
-    """Render and require: no console errors, non-empty page. Raises RenderError."""
+    """Validate output: clean standalone document, no console errors, non-empty.
+
+    The artifact check runs first (free, no render) so stray commentary/preamble
+    is rejected before spending a render. Raises RenderError on any failure.
+    """
+    if not looks_like_html_document(html):
+        raise RenderError(
+            "output is not a clean standalone HTML document "
+            "(stray text/commentary outside <!DOCTYPE html>…</html>)"
+        )
     result = await renderer.render(html)
     if result.console_errors:
         raise RenderError("console errors: " + "; ".join(result.console_errors[:5]))

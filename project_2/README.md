@@ -14,6 +14,14 @@ conversation context is stored. Only the fact of a user's authorization persists
 
 Reply for each result = the `.html` document **+** a PNG preview rendered with Playwright/Chromium.
 
+**Output cleanup & final validation.** Every model reply is deterministically sliced
+to just the `<!DOCTYPE html>…</html>` document — any stray commentary/preamble (e.g.
+"Looking at the problem zones, I need to fix…") is dropped for free (0 tokens). The
+final gate requires a clean standalone document that renders without console errors;
+if validation fails (no valid document, or a render error), the bot regenerates on the
+cached conversation asking for HTML-only and re-checks, up to `IMG_MAX_ITERS` times,
+before sending. Problem-zone resolution is handled by the iterative correction loop.
+
 ## Stack
 
 Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 (long-polling) · aiosqlite ·

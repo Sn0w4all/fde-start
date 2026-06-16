@@ -15,6 +15,13 @@ def test_strip_markdown_noop():
     assert _strip_markdown(raw) == raw
 
 
+async def test_validate_rejects_artifacts_without_rendering():
+    """Artifact guard fails fast — raises before touching the renderer."""
+    bad = "Looking at the problem zones, I need to fix:\n<!DOCTYPE html><html></html>"
+    with pytest.raises(RenderError):
+        await validate(None, bad)  # renderer never used; guard trips first
+
+
 def _chromium_available() -> bool:
     try:
         from playwright.sync_api import sync_playwright

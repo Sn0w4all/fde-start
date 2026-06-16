@@ -88,6 +88,17 @@ async def run_img2html(
             break
         html, render_png = new_html, new_result.png
 
-    # Step 5: final validation.
-    final = await validate(renderer, html)
-    return Artifact(kind="img2html", html=html, png=final.png)
+    # Step 5: final validation — must be a clean standalone document that renders
+    # without console errors. On failure (e.g. stray commentary that survived, or
+    # a render error), regenerate on the cached conversation and re-check, up to
+    # IMG_MAX_ITERS times, before giving up.
+    last_err: str | None = None
+    for attempt in range(settings.img_max_iters):
+        try:
+            final = await validate(renderer, html)
+            return Artifact(kind="img2html", html=html, png=final.png)
+        except RenderError as exc:
+            last_err = str(exc)
+            log.warning("img2html_final_reject", attempt=attempt, error=last_err)
+            html, messages = await llm.regenerate_clean(messages, reason=last_err)
+    raise RenderError(f"img2html failed final validation after retries: {last_err}")
