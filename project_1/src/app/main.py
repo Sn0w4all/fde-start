@@ -5,6 +5,7 @@ from .loaders import data_loader
 from .transformers import normalize
 from .storage import repository
 from .analytics import report_stats
+from .reports import report_builder
 # запуск: 
 # cd /Users/antonzotov/dev/fde-start/project_1/src
 # python -m app.main
@@ -76,11 +77,14 @@ def main():
     raw_data = {}
     for config_iis in config_list:
         raw_data.update(data_loader.load_data(config_iis))
-    repository.save_data(raw_data, "raw") # Сырые данные складываем в data
+    repository.save_data(raw_data, "raw", ".json") # Сырые данные складываем в data
     normalized_data = normalize.normalize_data(raw_data, interests) # Трансформируем данные
-    repository.save_data(normalized_data, "normalized") # Готовые данные складываем в data
-    reports = report_stats.get_analysis(normalized_data) # Анализируем данные 
-    repository.save_data(reports, "reports") # Сохраняем отчеты в data
+    repository.save_data(normalized_data, "normalized", ".json") # Готовые данные складываем в data
+    text_reports = report_stats.get_analysis(normalized_data) # Анализируем данные 
+    repository.save_data(text_reports, "reports", ".json") # Сохраняем отчеты в data
+    html_reports = report_builder.get_html_report(text_reports) # Преобразовываем тестовый отчет в HTML
+    repository.save_data(html_reports, "html_reports",".html") # Сохраняем html в data
+
     logger.info("Finished the application")
 
 # Пишем лог файл
