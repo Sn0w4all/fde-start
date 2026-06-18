@@ -12,8 +12,9 @@ def save_data(data, data_type = "raw", data_format = ".json"):
     folder.mkdir(parents=True, exist_ok=True)   # создаст папку, если её нет
     path = folder / f"{data_type}_data_{time}{data_format}"
     with open(path, "w", encoding="utf-8") as f:
-        if data_type == "html":
-            json.dump(data["html"], f, ensure_ascii=False, indent=2)
+        if data_type == "html_reports":
+            html = data["html"]
+            f.write(html)
         else:
             json.dump(data, f, ensure_ascii=False, indent=2)
     logger.info("Saving %s data to %s", data_type, path)

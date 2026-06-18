@@ -18,13 +18,31 @@ def get_analysis(normalized_data):
     reports = []
     try:
         for position, data in normalized_data.items():
+            
+            prompt_path = Path(__file__).parent / "analytics_prompt.md"
+            prompt_file = str(prompt_path)
+
+            try:
+                with open(prompt_file, "r", encoding="utf-8") as f:
+                    prompt = f.read()
+                    params = {
+                        "position": position,
+                        "normalized_data": normalized_data,
+                        "data": json.dumps(data, ensure_ascii=False, indent=2)                     
+                    }
+                    prompt = prompt.format_map(params)
+            except Exception as e:
+                logger.error("Ошибка при загрузке промпта из %s",prompt_path)
+                return None
+
+
             comment = client.messages.create(
                 model="claude-haiku-4-5",
                 max_tokens=1200,
                 messages=[
                     {
                         "role": "user", 
-                        "content": f"Ты финансовый аналитик,  опиши и прокомментируй(без рекомендаций) по активу {position} значения цены сегодня: {json.dumps(data, ensure_ascii=False, indent=2)}.  Что это может означать для трейдера? Используй для оценки корреляции следующие значения {normalized_data}"
+                        "content": prompt
                     }
                 ],
             )

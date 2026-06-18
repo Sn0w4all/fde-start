@@ -84,7 +84,6 @@ def main():
     repository.save_data(text_reports, "reports", ".json") # Сохраняем отчеты в data
     html_reports = report_builder.get_html_report(text_reports) # Преобразовываем тестовый отчет в HTML
     repository.save_data(html_reports, "html_reports",".html") # Сохраняем html в data
-
     logger.info("Finished the application")
 
 # Пишем лог файл
