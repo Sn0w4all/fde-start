@@ -1,10 +1,14 @@
 from datetime import datetime
 from pathlib import Path
 import json 
+from ..config import saved_format as sf, saved_type as st
 import logging
 logger = logging.getLogger(__name__)
 
-def save_data(data, data_type = "raw", data_format = ".json"):
+
+def save_data(data, data_type = st.RAW, data_format = sf.JSON):
+    data_type = data_type.value
+    data_format  = data_format.value
     date = datetime.now().strftime("%Y-%m-%d")
     time = datetime.now().strftime("%H-%M-%S")
     core_folder = Path(__file__).parent.parent.parent.parent / "data"

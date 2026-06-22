@@ -1,3 +1,18 @@
+from enum import Enum
+class saved_type(str, Enum):
+    RAW = "raw"
+    NORMALIZE = "normalized"
+    TEXT_REPORT = "report"
+    HTML = "html_report"
+
+class saved_format(str, Enum):
+    JSON = ".json"
+    HTML = ".html"
+
+def __str__(self):
+    return self.value
+
+
 def get_config(interests):
     if isinstance(interests, dict):
         interests = [interests]
