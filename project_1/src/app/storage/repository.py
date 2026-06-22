@@ -16,7 +16,7 @@ def save_data(data, data_type = st.RAW, data_format = sf.JSON):
     folder.mkdir(parents=True, exist_ok=True)   # создаст папку, если её нет
     path = folder / f"{data_type}_data_{time}{data_format}"
     with open(path, "w", encoding="utf-8") as f:
-        if data_type == "html_reports":
+        if data_type == st.HTML.value:
             html = data["html"]
             f.write(html)
         else:
@@ -24,9 +24,9 @@ def save_data(data, data_type = st.RAW, data_format = sf.JSON):
     logger.info("Saving %s data to %s", data_type, path)
 
 
-def load_latest_data(data_type  = "raw"):
+def load_latest_data(data_type = st.RAW):
     #Находит самый свежий JSON файл в папке и подпапках и загружает его
-    
+    data_type = data_type.value
     folder = Path(__file__).parent.parent.parent.parent / "data"
     folder_path = str(folder)
     if not folder.exists():

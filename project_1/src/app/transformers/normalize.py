@@ -1,11 +1,12 @@
 from ..storage.repository import load_latest_data
 from datetime import datetime
+from ..config import saved_type as st
 
 import logging
 logger = logging.getLogger(__name__)
 
 def normalize_data(raw_data, interests):
-    normalized_data = load_latest_data("normalized")
+    normalized_data = load_latest_data(st.NORMALIZE)
     if normalized_data is None:
         normalized_data = {}
     for ticker, ticker_data in raw_data.items():
