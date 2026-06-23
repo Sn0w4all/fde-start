@@ -5,6 +5,7 @@ import os
 import json
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 SCRIPT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
@@ -14,7 +15,7 @@ client = anthropic.Anthropic(
     api_key=os.environ.get("ANTHROPIC_API_KEY"),
 )
 
-def get_analysis(normalized_data):
+async def get_analysis(normalized_data):
     reports = []
     prompt_path = Path(__file__).parent / "analytics_prompt.md"
     prompt_file = str(prompt_path)
@@ -76,5 +77,5 @@ def get_analysis(normalized_data):
         logger.error("API Error: %s", e)
         return None
     except Exception as e:
-        logger.error("Unexpected error: %s", e)
-        return None
+        logger.exception("Unexpected error")
+        raise

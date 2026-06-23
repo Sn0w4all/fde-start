@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 def save_data(data, data_type = st.RAW, data_format = sf.JSON):
     data_type = data_type.value
     data_format  = data_format.value
+    if data == None:
+        logger.info("%s data empty. nothing to save", data_type)
+        return None
     date = datetime.now().strftime("%Y-%m-%d")
     time = datetime.now().strftime("%H-%M-%S")
     core_folder = Path(__file__).parent.parent.parent.parent / "data"

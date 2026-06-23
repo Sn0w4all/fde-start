@@ -6,6 +6,9 @@ from .transformers import normalize
 from .storage import repository
 from .analytics import report_stats
 from .reports import report_builder
+from .retry import with_backoff
+import anthropic
+import asyncio
 
 # запуск: 
 # cd /Users/antonzotov/dev/fde-start/project_1/src
@@ -23,6 +26,18 @@ handler = TimedRotatingFileHandler(
     encoding="utf-8",
 )
 
+_RETRY_EXC = (
+    anthropic.APIConnectionError,
+    anthropic.RateLimitError,
+    anthropic.InternalServerError,
+    anthropic.APITimeoutError,
+    anthropic.APIError,
+    anthropic.ConflictError,
+    anthropic.NotFoundError,
+    anthropic.BadRequestError,
+    anthropic.AuthenticationError,
+    anthropic.PermissionDeniedError,
+)
 #вариант по размеру
 # from logging.handlers import RotatingFileHandler
 # handler = RotatingFileHandler(
@@ -74,7 +89,7 @@ def setup_logging():
 
 
 
-def main():
+async def main():
     logger.info("Starting the application")
     config_list = get_config(interests) # Получаем конфиги для каждого интереса
     raw_data = {}
@@ -83,9 +98,18 @@ def main():
     repository.save_data(raw_data, st.RAW, sf.JSON) # Сырые данные складываем в data
     normalized_data = normalize.normalize_data(raw_data, interests) # Трансформируем данные
     repository.save_data(normalized_data, st.NORMALIZE, sf.JSON) # Готовые данные складываем в data
-    text_reports = report_stats.get_analysis(normalized_data) # Анализируем данные 
+    text_reports = await with_backoff(
+        lambda: report_stats.get_analysis(normalized_data),
+        exc_types=_RETRY_EXC
+    )
+
     repository.save_data(text_reports, st.TEXT_REPORT, sf.JSON) # Сохраняем отчеты в data
-    html_reports = report_builder.get_html_report(text_reports) # Преобразовываем тестовый отчет в HTML
+
+    html_reports =  await with_backoff(
+        lambda: report_builder.get_html_report(text_reports), # Преобразовываем тестовый отчет в HTML
+        exc_types=_RETRY_EXC
+    )
+
     repository.save_data(html_reports, st.HTML, sf.HTML) # Сохраняем html в data
     logger.info("Finished the application")
 
@@ -93,4 +117,4 @@ def main():
 
 if __name__ == "__main__":
     setup_logging()
-    main()
+    asyncio.run(main())
