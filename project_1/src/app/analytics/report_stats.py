@@ -1,4 +1,5 @@
 import anthropic
+import requests
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -75,7 +76,7 @@ async def get_analysis(normalized_data):
 
     except anthropic.BadRequestError as e:
         logger.error("API Error: %s", e)
-        return None
-    except Exception as e:
-        logger.exception("Unexpected error")
+        raise
+    except requests.exceptions.RequestException as e:
+        logger.error("Network error %s", e)
         raise

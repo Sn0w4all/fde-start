@@ -24,15 +24,13 @@ def normalize_data(raw_data, interests):
                 'data': []
             }
         # Если уже есть более менее свежие данные - оставляем их
-   
-        current_dt = datetime.now()
-        last_entry = normalized_data[ticker]["data"][-1]
-        last_dt = datetime.strptime(last_entry["date"], "%Y-%m-%d %H:%M:%S")
-        delta = current_dt - last_dt
-        hours = 1 + int(delta.total_seconds() // 3600)
-        if (hours < 4):
-            logger.info("По тикеру %s уже есть свежие данные не позднее %d часов", ticker, hours)
-            break
+        entries = normalized_data[ticker]["data"]
+        if entries:
+            last_dt = datetime.strptime(entries[-1]["date"], "%Y-%m-%d %H:%M:%S")
+            hours = 1 + int((datetime.now() - last_dt).total_seconds() // 3600)
+            if hours < 4:
+                logger.info("По тикеру %s уже есть свежие данные (<%d ч)", ticker, hours)
+                continue
 
         columns = ticker_data["marketdata"]["columns"]
         data = ticker_data["marketdata"]["data"]

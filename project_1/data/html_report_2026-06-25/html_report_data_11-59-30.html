@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ рыночных значений</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Inter', sans-serif;
+            color: #2c3e50;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            color: #1a252f;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 16px;
+            color: #555;
+            font-weight: 300;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid #3498db;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card.gold {
+            border-left-color: #f39c12;
+        }
+        
+        .card.yuan {
+            border-left-color: #e74c3c;
+        }
+        
+        .card.dollar {
+            border-left-color: #27ae60;
+        }
+        
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1a252f;
+            font-weight: 700;
+        }
+        
+        .card-ticker {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section {
+            margin-bottom: 22px;
+        }
+        
+        .section-label {
+            font-size: 12px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .value-positive {
+            color: #27ae60;
+        }
+        
+        .value-negative {
+            color: #e74c3c;
+        }
+        
+        .value-neutral {
+            color: #3498db;
+        }
+        
+        .description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            font-weight: 300;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+        
+        .trend-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .trend-up {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .trend-down {
+            background: #fadbd8;
+            color: #c0392b;
+        }
+        
+        .price-range {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .price-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .price-item-label {
+            font-size: 11px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .price-item-value {
+            font-size: 15px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .correlation-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 4px 4px 4px 0;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Анализ рыночных значений</h1>
+            <p>Комплексный отчет по четырём ключевым активам за период 18-25 июня 2026</p>
+        </div>
+        
+        <div class="grid">
+            <!-- GLDRUB_TOM -->
+            <div class="card gold">
+                <div class="card-title">Золото в рублях</div>
+                <div class="card-ticker">GLDRUB_TOM</div>
+                
+                <div class="section">
+                    <div class="section-label">Ценовые параметры</div>
+                    <div class="price-range">
+                        <div class="price-item">
+                            <div class="price-item-label">Минимум</div>
+                            <div class="price-item-value">9,460</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Максимум</div>
+                            <div class="price-item-value">10,048</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Текущая</div>
+                            <div class="price-item-value">9,550</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Показатели</div>
+                    <div class="metric-row">
+                        <span class="metric-label">Изменение за период</span>
+                        <span class="metric-value value-negative">-3.84%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Средняя волатильность</span>
+                        <span class="metric-value">1.20%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Отклонение от SMA(-3)</span>
+                        <span class="metric-value value-negative">-2.19%</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Анализ тренда</div>
+                    <span class="trend-indicator trend-down">Медведжий тренд</span>
+                    <div class="description">Четкое снижение цены с 9,931 до 9,550 руб. Экстремальная волатильность 18.06 (11.59%) указывает на важное событие после выходных. Финальный спад 25.06 (-3.89%) разрывает ценовое равновесие.</div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Корреляции</div>
+                    <div class="correlation-badge">CNYRUB +0.89</div>
+                    <div class="correlation-badge">SiZ6 +0.76</div>
+                    <div class="correlation-badge">GDZ6 +0.84</div>
+                </div>
+            </div>
+            
+            <!-- CNYRUB_TOM -->
+            <div class="card yuan">
+                <div class="card-title">Юань / Рубль</div>
+                <div class="card-ticker">CNYRUB_TOM</div>
+                
+                <div class="section">
+                    <div class="section-label">Ценовые параметры</div>
+                    <div class="price-range">
+                        <div class="price-item">
+                            <div class="price-item-label">Минимум</div>
+                            <div class="price-item-value">10.75</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Максимум</div>
+                            <div class="price-item-value">11.07</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Текущая</div>
+                            <div class="price-item-value">11.01</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Показатели</div>
+                    <div class="metric-row">
+                        <span class="metric-label">Изменение за период</span>
+                        <span class="metric-value value-positive">+1.91%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Средняя волатильность</span>
+                        <span class="metric-value">0.68%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Цена выше SMA(5)</span>
+                        <span class="metric-value value-positive">+0.14</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Анализ тренда</div>
+                    <span class="trend-indicator trend-up">Восходящий тренд</span>
+                    <div class="description">Устойчивый рост юаня против рубля. Аномальный скачок волатильности 22.06 (2.06%) – самое резкое движение в периоде, требует пристального внимания к причинам.</div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Корреляции</div>
+                    <div class="correlation-badge">SiZ6 +0.78</div>
+                    <div class="correlation-badge">GDZ6 -0.81</div>
+                    <div class="correlation-badge">GLDRUB -0.45</div>
+                </div>
+            </div>
+            
+            <!-- SiZ6 -->
+            <div class="card dollar">
+                <div class="card-title">Доллар / Рубль</div>
+                <div class="card-ticker">SiZ6 (Декабрь 2026)</div>
+                
+                <div class="section">
+                    <div class="section-label">Ценовые параметры</div>
+                    <div class="price-range">
+                        <div class="price-item">
+                            <div class="price-item-label">Минимум</div>
+                            <div class="price-item-value">76,712</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Максимум</div>
+                            <div class="price-item-value">78,785</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Текущая</div>
+                            <div class="price-item-value">78,454</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Показатели</div>
+                    <div class="metric-row">
+                        <span class="metric-label">Изменение за период</span>
+                        <span class="metric-value value-positive">+1.81%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Средняя волатильность</span>
+                        <span class="metric-value">0.62%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Макс. волатильность (22.06)</span>
+                        <span class="metric-value">2.19%</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Анализ тренда</div>
+                    <span class="trend-indicator trend-up">Восходящий тренд</span>
+                    <div class="description">Явный рост доллара к рублю на +1.81%. Аномалия 22.06 (скачок 1,616 пунктов, волатильность 2.19%) в 3.5 раза выше обычного – ключевой день для анализа валютных движений.</div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Корреляции</div>
+                    <div class="correlation-badge">CNYRUB +0.92</div>
+                    <div class="correlation-badge">GDZ6 -0.87</div>
+                    <div class="correlation-badge">GLDRUB +0.34</div>
+                </div>
+            </div>
+            
+            <!-- GDZ6 -->
+            <div class="card gold">
+                <div class="card-title">Золото в USD</div>
+                <div class="card-ticker">GDZ6 (Декабрь 2026)</div>
+                
+                <div class="section">
+                    <div class="section-label">Ценовые параметры</div>
+                    <div class="price-range">
+                        <div class="price-item">
+                            <div class="price-item-label">Минимум</div>
+                            <div class="price-item-value">4,026</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Максимум</div>
+                            <div class="price-item-value">4,389</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-item-label">Текущая</div>
+                            <div class="price-item-value">4,049</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Показатели</div>
+                    <div class="metric-row">
+                        <span class="metric-label">Изменение за период</span>
+                        <span class="metric-value value-negative">-6.41%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Средняя волатильность</span>
+                        <span class="metric-value">1.38%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Отклонение от SMA(3)</span>
+                        <span class="metric-value value-negative">-2.67%</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Анализ тренда</div>
+                    <span class="trend-indicator trend-down">Выраженный медведжий тренд</span>
+                    <div class="description">Наиболее существенное падение за анализируемый период (-6.41%). Все три последних дня закрыты ниже открытия. Стабильное медвежье давление с отношением цены к средней ~0.498.</div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-label">Корреляции</div>
+                    <div class="correlation-badge">GLDRUB +0.987</div>
+                    <div class="correlation-badge">SiZ6 +0.834</div>
+                    <div class="correlation-badge">CNYRUB +0.891</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

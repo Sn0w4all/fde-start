@@ -31,7 +31,8 @@ async def with_backoff(
             if i == attempts - 1:
                 break
             delay = min(max_delay, base_delay * (2**i)) + random.uniform(0, 0.5)
-            logger.warning("retrying %d attempts because of %s",i + 1, str(exc))
+            logger.warning("retrying attempt %d/%d failed because of %s",i + 1, attempts, str(exc))
             await asyncio.sleep(delay)
-    assert last is not None
-    return None
+            
+    raise last
+   
