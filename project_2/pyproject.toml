@@ -7,7 +7,7 @@ dependencies = [
     "aiogram>=3.13",
     "aiosqlite>=0.20",
     "anthropic>=0.40",
-    "playwright>=1.48",
+    "playwright==1.48.0",
     "Pillow>=11.0",
     "pydantic-settings>=2.6",
     "structlog>=24.4",
